@@ -1,21 +1,23 @@
 const CACHE_NAME = 'app-shell-v1';
 
-async function retrieveCharacter(name) {
-    try {
-        const response =  await fetch(`https://swapi.dev/api/people/?search=${name}`);
-        const character = await response.json();
-        return character.results;
-    } catch (error) {
-        console.log('Server error!', error);
-    }
-}
+const URL_API = 'https://swapi.dev/api/people/?search=r2-d2';
 
+/*
+    Executing fetch() starts a request and returns a promise. When the request completes, 
+    the promise is resolved with the Response. If the request fails due to some network problems, 
+    the promise is rejected. 
+ */
 async function cacheData() {
     try {
-        const result = await retrieveCharacter('r2-d2');
-        console.log('[Cache Data]', result);
+        
         const cache = await caches.open(CACHE_NAME);
-        return await cache.add(result);
+        fetch(URL_API)
+            .then(response => {
+                if (!response) {
+                    throw Error('Could not retrieve data...');
+                }
+                return cache.put(URL_API, response);
+            })
     } catch (error) {
         console.log('Failed to install cache', error);
     }
