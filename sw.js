@@ -1,4 +1,4 @@
-const CACHE_NAME = 'app-shell-v1';
+const CACHE_NAME = 'app-shell-v2';
 
 const URL_API = 'https://swapi.dev/api/people/?search=r2-d2';
 
@@ -8,8 +8,7 @@ const URL_API = 'https://swapi.dev/api/people/?search=r2-d2';
     the promise is rejected. 
  */
 async function cacheData() {
-    try {
-        
+    try {   
         const cache = await caches.open(CACHE_NAME);
         fetch(URL_API)
             .then(response => {
@@ -27,6 +26,17 @@ self.addEventListener('install', event => {
     console.log('[Service Worker] Installing Service Worker...');
     event.waitUntil(cacheData());
     self.skipWaiting();
+});
+
+self.addEventListener('activate', event => {
+    event.waitUntil(
+        setInterval(() => {
+            caches.keys().then(cache => {
+                caches.delete(cache);
+            })
+            .catch(_ => 'Could not find any cache...')
+        }, 2000)
+    );
 })
 
 async function networkFirst(request) {
